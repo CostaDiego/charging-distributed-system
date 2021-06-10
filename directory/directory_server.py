@@ -1,17 +1,19 @@
 from rpyc import Service
 from rpyc.utils.server import ThreadedServer
 import sys
+from constRPYC import DIR_SERVER_IP, DIR_SERVER_PORT
 
 _SERVER = "SERVER"
 _IP =  "IP"
 _PORT = "PORT"
 
 class Directory(Service):
-    registry = dict()
+    registry_server = dict()
+    registry_users = dict()
 
     def exposed_register_server(self, ip_adress, port_number):
         
-        self.registry[_SERVER] = {
+        self.registry_server[_SERVER] = {
             _IP: ip_adress,
             _PORT: port_number
         }
@@ -20,13 +22,13 @@ class Directory(Service):
 
     def exposed_retrieve_server(self):
 
-        if _SERVER in self.registry.keys():
-            return self.registry[_SERVER]
+        if _SERVER in self.registry_server.keys():
+            return self.registry_server[_SERVER]
 
         return None
 
     def exposed_register_user(self, username, ip_adress, port_number):
-        self.registry[username] = {
+        self.registry_users[username] = {
             _IP: ip_adress,
             _PORT: port_number
         }
@@ -34,21 +36,24 @@ class Directory(Service):
         return True
 
     def exposed_retrieve_user(self, username):
-        if username in self.registry.keys():
-            return self.registry[username]
+        if username in self.registry_users.keys():
+            return self.registry_users[username]
         
         return None
 
     def exposed_check_user(self, username):
-        if username in self.registry.keys():
+        if username in self.registry_users.keys():
             return True
         
         return False
-        
 
-def run(port):
+    def exposed_list_users(self):
+        return list(self.registry_users.keys())
+
+
+def run():
     try:
-        server_dir = ThreadedServer(Directory, port = port )
+        server_dir = ThreadedServer(Directory, port = DIR_SERVER_PORT )
         print ("Server Started. Waiting Requests")
         server_dir.start()
 
