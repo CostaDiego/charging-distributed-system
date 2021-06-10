@@ -16,7 +16,7 @@ _CREDIT_CARD = 'CREDIT_CARD'
 _PASSWORD = 'PASSWORD'
 _BALANCE = 'BALANCE'
 
-class OperationServer(Service):
+class TransactionServer(Service):
     fields = [
         _NAME,
         _BANK,
@@ -46,7 +46,7 @@ class OperationServer(Service):
 
 def run(port, directory_ip = DIR_SERVER_IP, directory_port = DIR_SERVER_PORT):
     try:
-        op_server = ThreadedServer(OperationServer, port = port)
+        op_server = ThreadedServer(TransactionServer, port = port)
         conn_dir = connect(directory_ip, directory_port)
         my_address = socket.gethostbyname(socket.gethostname())
 

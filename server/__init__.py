@@ -1,4 +1,4 @@
-__all__ = ['operation_server']
+__all__ = ['transaction_server']
 
 from os import path
 import sys
@@ -8,5 +8,5 @@ root = path.abspath('..')
 if root not in sys.path:
     sys.path.append(root)
 
-from server.operation_server import run as run_server
-from server.operation_server import OperationServer
+from server.transaction_server import run as run_server
+from server.transaction_server import TransactionServer
