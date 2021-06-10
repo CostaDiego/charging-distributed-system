@@ -8,21 +8,42 @@ _PORT = "PORT"
 
 class Directory(Service):
     registry = dict()
-    response = "Worked!"
 
     def exposed_register_server(self, ip_adress, port_number):
         
-        registry[_SERVER] = {
+        self.registry[_SERVER] = {
             _IP: ip_adress,
-            _PORT, port_number
+            _PORT: port_number
         }
+
+        return True
 
     def exposed_retrieve_server(self):
 
-        if _SERVER self.registry.keys():
+        if _SERVER in self.registry.keys():
             return self.registry[_SERVER]
 
         return None
+
+    def exposed_register_user(self, username, ip_adress, port_number):
+        self.registry[username] = {
+            _IP: ip_adress,
+            _PORT: port_number
+        }
+
+        return True
+
+    def exposed_retrieve_user(self, username):
+        if username in self.registry.keys():
+            return self.registry[username]
+        
+        return None
+
+    def exposed_check_user(self, username):
+        if username in self.registry.keys():
+            return True
+        
+        return False
         
 
 def run(port):
