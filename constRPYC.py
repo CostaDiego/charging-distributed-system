@@ -1,0 +1,2 @@
+DIR_SERVER_IP  = 'localhost' 
+DIR_PORT_IP = 12345
