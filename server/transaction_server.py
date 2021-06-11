@@ -40,14 +40,28 @@ class TransactionServer(Service):
         print(f"[{datetime.now()}] - Returning fields")
         return deepcopy(list(self.fields))
 
-    def exposed_create_user(self, username, fields):
+    def perform_register_user(self, username, user_ip, user_port):
+        try:
+            conn_dir = connect(DIR_SERVER_IP, DIR_SERVER_PORT)
+            return conn_dir.root.exposed_register_user(username, user_ip, user_port)
+
+        except Exception as e:
+            print(f"[{datetime.now()}] - ERROR: {e}")
+
+        finally:
+            conn_dir.close()
+
+
+    def exposed_create_user(self, username, user_ip, user_port, fields):
         print(f"[{datetime.now()}] - Creating new user")
 
         if (len(fields) == len(self.fields) and isinstance(fields, dict)):
+            if self.perform_register_user(username, user_ip, user_port):
+                self.user_database[username] = fields
 
-            self.user_database[username] = fields
-
-            return True
+                return True
+                
+            return False
 
         else:
             return False
