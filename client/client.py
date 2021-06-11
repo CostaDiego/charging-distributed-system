@@ -51,11 +51,12 @@ def _initialize_client(server, client_port):
     if isinstance(fields, list) and len(fields) > 0:
         infos = dict()
 
-        print("Please provide the following information:\n")
-        username = input(_USERNAME.title())
+        print("\n=== Please provide the following information ===\n")
+        username = input(_USERNAME.title()+":\t")
 
         for field in fields:
-            infos[field] = input(" ".join(field.split("_")).title())
+            text_input = " ".join(field.split("_")).title() + ":\t"
+            infos[field] = input(text_input)
         
         return server.root.exposed_create_user(
             username,
@@ -70,7 +71,7 @@ def _flow_control(dir_server, trans_server):
 def run(port, directory_ip = DIR_SERVER_IP, directory_port = DIR_SERVER_PORT):
     try:
         conn_dir = connect(directory_ip, directory_port)
-        server_ip_port = conn_dir.exposed_retrieve_server()
+        server_ip_port = conn_dir.root.exposed_retrieve_server()
 
         conn_srv = connect(server_ip_port[_IP], server_ip_port[_PORT])
 
