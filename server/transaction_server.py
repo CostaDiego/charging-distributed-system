@@ -1,6 +1,7 @@
 from rpyc import Service, connect
 from rpyc.utils.server import ThreadedServer
 from datetime import datetime
+from copy import deepcopy
 import socket
 import sys
 
@@ -37,7 +38,7 @@ class TransactionServer(Service):
 
     def exposed_get_fields(self):
         print(f"[{datetime.now()}] - Returning fields")
-        return list(self.fields)
+        return deepcopy(list(self.fields))
 
     def exposed_create_user(self, username, fields):
         print(f"[{datetime.now()}] - Creating new user")

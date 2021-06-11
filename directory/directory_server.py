@@ -1,5 +1,6 @@
 from rpyc import Service
 from rpyc.utils.server import ThreadedServer
+from copy import deepcopy
 import sys
 from datetime import datetime
 
@@ -60,7 +61,7 @@ class Directory(Service):
     def exposed_list_users(self):
         print(f"[{datetime.now()}] - Listing users")
 
-        return list(self.registry_users.keys())
+        return deepcopy(list(self.registry_users.keys()))
 
 
 def run():
