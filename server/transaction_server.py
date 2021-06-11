@@ -67,9 +67,9 @@ class TransactionServer(Service):
             return False
 
     def perform_charge_user(self, orig_username, target_username, value):
-        if self.user_database[orig_username][_BALANCE] - value >= 0:
-            self.user_database[orig_username][_BALANCE] -= value
-            self.user_database[target_username][_BALANCE] += value
+        if self.user_database[target_username][_BALANCE] - value >= 0:
+            self.user_database[orig_username][_BALANCE] += value
+            self.user_database[target_username][_BALANCE] -= value
 
             return True
 

@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-from directory.directory_server import run
 from directory import run_directory
 from server import run_server
 from client import run_client
