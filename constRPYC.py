@@ -1,2 +1,2 @@
-DIR_SERVER_IP  = 'localhost' 
+DIR_SERVER_IP  = '172.31.92.58' 
 DIR_SERVER_PORT = 12345

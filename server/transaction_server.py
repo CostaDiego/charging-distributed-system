@@ -60,7 +60,7 @@ class TransactionServer(Service):
                 if not isinstance(fields[_BALANCE], float):
                     fields[_BALANCE] = float(fields[_BALANCE])
 
-                self.user_database = {username: fields}
+                self.user_database[username] = fields
 
                 return True
                 
