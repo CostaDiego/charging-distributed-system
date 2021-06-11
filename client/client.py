@@ -14,30 +14,36 @@ _PORT = 'PORT'
 
 _NOTIFY_TRANFERENCE = 'NOTIFY_TRANFERENCE'
 _CHARGE_USER = 'CHARGE_USER'
+_STANDBY = 'STANDBY'
+_CHARGE = 'CHARGE'
 
 _USERNAME = 'USERNAME'
 _NAME = 'NAME'
 _VALUE = 'VALUE'
+_BALANCE = 'BALANCE'
 
 _YES = 'YES'
 _Y = 'Y'
 
 
 class Client(Service):
-
+    username = None
+    
     def exposed_callbacks(self, callback, params = None):
         if callback == _NOTIFY_TRANFERENCE:
-            self.perform_notify(params)
+            return self.perform_notify(params)
 
         if callback == _CHARGE_USER:
-            self.perform_charge(params)
+            return self.perform_charge(params)
 
     def perform_charge(self, params):
         print(f"ALERT:\n {params[_NAME].title()} charged you R$ {params[_VALUE]}!")
-        resp = input("Accept?[Y/N]: ").upper()
+        resp = input("Accept?[Y/N]: ")
+        resp = resp.upper()
 
         if resp == _YES or resp == _Y:
-            return input("Input the password:\n")
+            password = input("Input the password:\t")
+            return password
 
         return False
     
@@ -53,10 +59,14 @@ def _initialize_client(server, client_port):
 
         print("\n=== Please provide the following information ===\n")
         username = input(_USERNAME.title()+":\t")
+        Client.username = username
 
         for field in fields:
             text_input = " ".join(field.split("_")).title() + ":\t"
-            infos[field] = input(text_input)
+            if field == _BALANCE:
+                infos[field] = float(input(text_input))
+            else:
+                infos[field] = input(text_input)
         
         return server.root.exposed_create_user(
             username,
@@ -65,8 +75,47 @@ def _initialize_client(server, client_port):
             infos
         )
             
-def _flow_control(dir_server, trans_server):
-    pass
+def _flow_control(dir_server, trans_server, port):
+    while(True):
+        mode_text = ('Choose the next action:\n' +
+                    '\t StandBy: STANDBY or [0]\n' +
+                    '\t Charge: CHARGE or [1]\n'+
+                    '\t Exit: EXIT\n')
+
+        mode = input(mode_text)
+
+        if mode == "0" or mode.upper() == _STANDBY:
+            try:
+                print("\t=== Client in Standby, press CTRL+C to go main menu ===\n")
+                client = ThreadedServer(Client, port = port)
+                client.start()
+
+            except Exception as err:
+                print(f"[{datetime.now()}] - ERROR: {err}")
+
+        elif mode == "1" or mode.upper() == _CHARGE:
+            try:
+                list_users = dir_server.root.exposed_list_users()
+                user_text= "Type the username to be charged:\n\t" + "\n\t".join(list_users) + "\n"
+                user_to_charge = input(user_text)
+                value = input("The value to be charged: \t")
+
+                result = trans_server.root.exposed_charge_user(
+                    Client.username,
+                    user_to_charge,
+                    value
+                )
+
+                if result:
+                    print(f"The user {user_to_charge} has accept the charging")
+                else:
+                    print(f"The user {user_to_charge} has failed to accept the charging")
+                    
+            except Exception as err:
+                print(f"[{datetime.now()}] - ERROR: {err}")
+
+        else:
+            break
 
 def run(port, directory_ip = DIR_SERVER_IP, directory_port = DIR_SERVER_PORT):
     try:
@@ -79,7 +128,9 @@ def run(port, directory_ip = DIR_SERVER_IP, directory_port = DIR_SERVER_PORT):
             print("Failed to create user. Exiting!")
             sys.exit()
 
-        _flow_control(conn_dir, conn_srv)
+        print("\n=== Successful Action! ===\n")
+
+        _flow_control(conn_dir, conn_srv, port)
 
     except Exception as e:
         print(f"[{datetime.now()}] - ERROR: {e}")

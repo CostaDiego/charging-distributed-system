@@ -57,7 +57,10 @@ class TransactionServer(Service):
 
         if (len(fields) == len(self.fields) and isinstance(fields, dict)):
             if self.perform_register_user(username, user_ip, user_port):
-                self.user_database[username] = fields
+                if not isinstance(fields[_BALANCE], float):
+                    fields[_BALANCE] = float(fields[_BALANCE])
+
+                self.user_database = {username: fields}
 
                 return True
                 
@@ -101,7 +104,6 @@ class TransactionServer(Service):
 
                 if (isinstance(response, str) and 
                     response == self.user_database[target_username][_PASSWORD]):
-
                     return self.perform_charge_user(
                             orig_username,
                             target_username,
